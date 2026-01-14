@@ -23,6 +23,41 @@ utl_function_service = utils.FunctionService()
 from dotenv import load_dotenv
 load_dotenv()
 
+def _extract_sources_from_context(context_docs):
+    """
+    Devuelve lista única (en orden) de nombres de documentos usados en la respuesta.
+    Espera una lista de langchain.schema.Document en context_docs.
+    """
+    if not context_docs:
+        return []
+
+    seen = set()
+    sources = []
+
+    for d in context_docs:
+        meta = getattr(d, "metadata", None) or {}
+
+        # Preferimos 'obj_name' (ej: mercado cacao en polvo.jpg)
+        name = meta.get("obj_name")
+
+        # Fallback: file_src_file_name (a veces viene con ruta)
+        if not name:
+            fsn = meta.get("file_src_file_name")
+            if fsn:
+                name = str(fsn).rsplit("/", 1)[-1]
+
+        # Fallback final: 'source'
+        if not name:
+            src = meta.get("source")
+            if src:
+                name = str(src).rsplit("/", 1)[-1]
+
+        if name and name not in seen:
+            seen.add(name)
+            sources.append(name)
+
+    return sources
+    
 # Load login and footer components
 st.session_state["page"] = "app_chat_03.py"
 login = component.get_login()
@@ -41,7 +76,10 @@ if login:
     # Header y descripción
     st.header(":material/network_intelligence: Vector Database")
     st.caption("AI Vector Search enables semantic and value-based searches on business data, enhancing LLM performance and RAG use cases securely and efficiently.")
+    st.session_state.setdefault("chat-save", [])
+    st.session_state.setdefault("chat-history", [])
 
+    
     username     = st.session_state["username"]
     language     = st.session_state["language"]
     user_id      = st.session_state["user_id"]
@@ -303,10 +341,31 @@ if login:
             elapsed_time = time.time() - start_time
 
             # 3. Extraemos la respuesta final
-            chat_ai_answer = chain["answer"]
+            #chat_ai_answer = chain["answer"]
+            # 3) Respuesta RAW (para guardar en memoria interna sin "Fuente(s)")
+            chat_ai_answer_raw = chain.get("answer", "")
+            
+            # 3.1) Documentos recuperados por RAG (LangChain create_retrieval_chain devuelve "context")
+            context_docs = chain.get("context", [])
+            
+            # 3.2) Extraer nombres de fuentes desde metadata
+            sources = _extract_sources_from_context(context_docs)
+            
+            # 3.3) Construir texto final para mostrar al usuario (con fuentes debajo)
+            if sources:
+                fuentes_md = "\n\n---\n**Fuente(s):** " + ", ".join([f"`{s}`" for s in sources])
+            else:
+                fuentes_md = "\n\n---\n**Fuente(s):** *(no disponible)*"
+            
+            chat_ai_answer_display = chat_ai_answer_raw + fuentes_md
+            
+            # (opcional) Si quieres que chat_ai_answer siga existiendo como antes
+            chat_ai_answer = chat_ai_answer_raw
+
 
             # 4. Calcular tokens (usando la utilidad del llm_model)
-            tokens_ids    = llm.get_token_ids(chat_ai_answer)
+            #tokens_ids    = llm.get_token_ids(chat_ai_answer)
+            tokens_ids    = llm.get_token_ids(chat_ai_answer_raw)
             answer_tokens = len(tokens_ids)
             token_rate    = answer_tokens / elapsed_time if elapsed_time > 0 else 0.0
             chat_tokens_rate_answer = f"{token_rate:.2f} tokens/s"
@@ -314,12 +373,14 @@ if login:
             # Muestra la respuesta en la UI
             placeholder = st.empty()
             with placeholder.chat_message("ai", avatar="images/llm_meta.svg"):
-                st.markdown(chat_ai_answer)
+                #st.markdown(chat_ai_answer)
+                st.markdown(chat_ai_answer_display)
                 
                 # También calculamos los tokens de entrada
                 input_tokens = len(llm.get_token_ids(chat_human_prompt_input))
                 chat_tokens  = input_tokens + answer_tokens
-                total_tokens = sum(int(item["chat_tokens"]) for item in st.session_state["chat-save"]) + chat_tokens
+                #total_tokens = sum(int(item["chat_tokens"]) for item in st.session_state["chat-save"]) + chat_tokens
+                total_tokens = sum(int(item["chat_tokens"]) for item in chat_save) + chat_tokens
 
                 annotated_text(
                     annotation("Rate", chat_tokens_rate_answer, background="#484c54", color="#ffffff"),
@@ -331,7 +392,8 @@ if login:
                 # Guardamos en "chat_ux_history" para que aparezca en la interfaz en la próxima iteración
                 chat_ux_history.add_user_message(chat_human_prompt_input)
                 chat_ux_history.add_ai_message(str(chat_human_prompt_image_input))  # la imagen
-                chat_ux_history.add_ai_message(chat_ai_answer)
+                #chat_ux_history.add_ai_message(chat_ai_answer)
+                chat_ux_history.add_ai_message(chat_ai_answer_display)
                 chat_ux_history.add_ai_message(chat_tokens_rate_answer)             # rate
                 chat_ux_history.add_ai_message(str(chat_tokens))                    # tokens
                 chat_ux_history.add_ai_message(str(total_tokens))                   # total_tokens
@@ -347,7 +409,9 @@ if login:
                 chat_save.append(chat_data)
 
             # 5) Actualizamos rag_history => agregamos el par (user_input, bot_answer)
-            chat_history.append((chat_human_prompt_input, chat_ai_answer))
+            #chat_history.append((chat_human_prompt_input, chat_ai_answer))
+            chat_history.append((chat_human_prompt_input, chat_ai_answer_raw))
+
         
         # Chat Buttons
         action_buttons_container = st.container()
@@ -369,7 +433,9 @@ if login:
                 #st.session_state["chat-objects"]    = []
                 st.session_state["chat-tokens"]     = 0
                 st.session_state["chat-save"]       = []
-                st.session_state["chat_session_id"] = ""
+                #st.session_state["chat_session_id"] = ""
+                if "chat_session_id" in st.session_state:
+                    del st.session_state["chat_session_id"]
                 st.session_state["chat-history"]    = []
                 st.rerun()
 
