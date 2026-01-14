@@ -74,7 +74,9 @@ def get_menu(modules, user):
 
         if available_demos:
             for label, page, icon in available_demos:
-                st.page_link(page, label=label, icon=icon)
+                display_label = "Chat Mastellone" if label == "Vector Database" else label
+                #st.page_link(page, label=label, icon=icon)
+                st.page_link(page, label=display_label, icon=icon)
         
         # Settings Section
         st.subheader("Settings")
