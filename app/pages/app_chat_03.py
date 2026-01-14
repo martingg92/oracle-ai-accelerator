@@ -49,6 +49,36 @@ if login:
     df_files     = db_file_service.get_all_files(user_id)[lambda df: df["MODULE_VECTOR_STORE"] == 1]
     df_agents    = db_agent_service.get_all_agents_cache(user_id)[lambda df: df["AGENT_TYPE"] == "Chat"]
 
+    # ------------------------------
+    # FORCE DEFAULTS: Document Agent + ALL Knowledge objects
+    # ------------------------------
+    st.session_state.setdefault("chat-agent", 0)
+    st.session_state.setdefault("chat-objects", [])
+    st.session_state.setdefault("chat-multimodal", False)
+
+    # 1) Forzar SIEMPRE el "Document Agent"
+    df_doc_agent = df_agents[df_agents["AGENT_NAME"].str.strip().str.lower() == "document agent"]
+
+    if not df_doc_agent.empty:
+        forced_agent_id = int(df_doc_agent.iloc[0]["AGENT_ID"])
+    elif not df_agents.empty:
+        forced_agent_id = int(df_agents.iloc[0]["AGENT_ID"])  # fallback
+    else:
+        forced_agent_id = 0
+
+    st.session_state["chat-agent"] = forced_agent_id
+
+    # 2) Forzar SIEMPRE TODOS los documentos (los que vienen de Knowledge y están en vector store)
+    st.session_state["chat-objects"] = df_files["FILE_ID"].astype(int).tolist() if not df_files.empty else []
+
+    # 3) Set multimodal flag coherente con el agente forzado
+    if forced_agent_id != 0 and not df_agents.empty:
+        model_type = df_agents.loc[df_agents["AGENT_ID"] == forced_agent_id, "AGENT_MODEL_TYPE"].values[0]
+        st.session_state["chat-multimodal"] = (model_type == "vlm")
+    else:
+        st.session_state["chat-multimodal"] = False
+
+
     # Aseguramos que el session_id se inicialice una sola vez
     if "chat_session_id" not in st.session_state:
         st.session_state["chat_session_id"] = f"{username}-{datetime.now().strftime('%Y%m%d%H%M%S%f')}"
@@ -328,14 +358,15 @@ if login:
         col1, col2, col3, col4, col5 = action_buttons_container.columns(cols_dimensions)
         
         with col1:
-            if st.button(key="objects", label="", help="Objects", icon=":material/deployed_code_update:"):
-                dialog_object()
+            if st.button(key="objects", label="", help="Objects", icon=":material/deployed_code_update:", disabled=True):
+                #dialog_object()
+                pass
 
         with col2:
             if st.button(key="clear", label="", help="Clear Chat", icon=":material/delete:", disabled=(not st.session_state["chat-objects"])):
                 chat_ux_history.clear()
-                st.session_state["chat-agent"]      = 0
-                st.session_state["chat-objects"]    = []
+                #st.session_state["chat-agent"]      = 0
+                #st.session_state["chat-objects"]    = []
                 st.session_state["chat-tokens"]     = 0
                 st.session_state["chat-save"]       = []
                 st.session_state["chat_session_id"] = ""
