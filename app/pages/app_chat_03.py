@@ -411,15 +411,19 @@ if login:
         with action_buttons_container:
             float_parent("margin-left:0.15rem; bottom:7rem; padding-top:1rem;")
         
-        cols_dimensions = [0.04, 0.04, 0.04, 0.04, 0.84]
-        col1, col2, col3, col4, col5 = action_buttons_container.columns(cols_dimensions)
+        #cols_dimensions = [0.04, 0.04, 0.04, 0.04, 0.84]
+        #col1, col2, col3, col4, col5 = action_buttons_container.columns(cols_dimensions)
+        # después (4 botones: clear / save / image + filler):
+        cols_dimensions = [0.04, 0.04, 0.04, 0.88]
+        col_clear, col_save, col_image, col_fill = action_buttons_container.columns(cols_dimensions)
         
-        with col1:
-            if st.button(key="objects", label="", help="Objects", icon=":material/deployed_code_update:", disabled=True):
-                #dialog_object()
-                pass
+        #with col1:
+            #if st.button(key="objects", label="", help="Objects", icon=":material/deployed_code_update:", disabled=True):
+                ##dialog_object()
+                #pass
 
-        with col2:
+        #with col2:
+        with col_clear:
             if st.button(key="clear", label="", help="Clear Chat", icon=":material/delete:", disabled=(not st.session_state["chat-objects"])):
                 chat_ux_history.clear()
                 #st.session_state["chat-agent"]      = 0
@@ -430,7 +434,8 @@ if login:
                 st.session_state["chat-history"]    = []
                 st.rerun()
 
-        with col3:
+        #with col3:
+        with col_save:
             st.session_state["chat-save"] = chat_save
             st.download_button(
                 key="Save",
@@ -443,12 +448,14 @@ if login:
                 disabled=(not st.session_state["chat-objects"])
             ) 
         
-        with col4:
+        #with col4:
+        with col_image:
             # Sólo habilitar si hay objetos y si el modelo es multimodal
             if st.button(key="image", label="", help="Image", icon=":material/image:", disabled=(not (st.session_state["chat-objects"] and st.session_state["chat-multimodal"]))):
                 dialog_image()
 
-        with col5:
+        #with col5:
+        with col_fill:
             st.empty()
         
     else:
