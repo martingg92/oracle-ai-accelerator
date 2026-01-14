@@ -47,6 +47,9 @@ def get_menu(modules, user):
         st.image("images/st_pages.gif")        
 
         st.markdown("## :red[Oracle AI] Accelerator :gray-badge[:material/smart_toy: " + global_version + "]")
+
+        # 👇 Logo empresa (debajo del gif y la versión, antes del nombre)
+        st.image("images/logo_SE.png", use_container_width=True)
         
         st.write(f"Hi, **:blue-background[{user}]**")
 
