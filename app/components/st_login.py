@@ -23,9 +23,7 @@ def load_mastellone_css():
         with open("styles/mastellone_theme.css") as f:
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     except FileNotFoundError:
-        pass  # Si no existe el archivo, continuar sin estilos
-
-global_version = "2.0.4"
+        pass
 
 def parse_modules(modules):
     """
