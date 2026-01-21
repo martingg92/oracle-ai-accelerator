@@ -23,8 +23,10 @@ component.get_footer()
 if login:
     st.set_page_config(layout="centered")
     
-    st.header(":material/upload_file: Profile")
-    st.caption("Manage profile.")
+    #st.header(":material/upload_file: Profile")
+    #st.caption("Manage profile.")
+    st.header(":material/manage_accounts: Perfil de Usuario")
+    st.caption("Administra tu información personal.")
 
     
     df_modules   = db_module_service.get_all_modules()
@@ -47,13 +49,19 @@ if login:
     with st.form("form-profile"):
         col1, col2 = st.columns(2)
         with col1:
-            username  = st.text_input("Username", value=original_data['username'], disabled=True)
-            password1 = st.text_input("Password", type="password", value=original_data['password'])
-            name      = st.text_input("First Name", value=original_data['name'])
+            username  = st.text_input("Usuario", value=original_data['username'], disabled=True)
+            password1 = st.text_input("Contraseña", type="password", value=original_data['password'])
+            name      = st.text_input("Nombre", value=original_data['name'])
+            #username  = st.text_input("Username", value=original_data['username'], disabled=True)
+            #password1 = st.text_input("Password", type="password", value=original_data['password'])
+            #name      = st.text_input("First Name", value=original_data['name'])
         with col2:
-            email     = st.text_input("Email", value=original_data['email'])
-            password2 = st.text_input("Confirm Password", type="password", value=original_data['password'])
-            last_name = st.text_input("Last Name", value=original_data['last_name'])
+            email     = st.text_input("Correo Electrónico", value=original_data['email'])
+            password2 = st.text_input("Confirmar Contraseña", type="password", value=original_data['password'])
+            last_name = st.text_input("Apellido", value=original_data['last_name'])
+            #email     = st.text_input("Email", value=original_data['email'])
+            #password2 = st.text_input("Confirm Password", type="password", value=original_data['password'])
+            #last_name = st.text_input("Last Name", value=original_data['last_name'])
 
         # Display module options as pills
         modules = st.pills(
