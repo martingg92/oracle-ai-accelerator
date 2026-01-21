@@ -73,8 +73,10 @@ if login:
     )
     
     # Header y descripción
-    st.header(":material/network_intelligence: Vector Database")
-    st.caption("AI Vector Search enables semantic and value-based searches on business data, enhancing LLM performance and RAG use cases securely and efficiently.")
+    #st.header(":material/network_intelligence: Vector Database")
+    #st.caption("AI Vector Search enables semantic and value-based searches on business data, enhancing LLM performance and RAG use cases securely and efficiently.")
+    st.header(":material/network_intelligence: Chat Mastellone")
+    st.caption("Asistente Virtual Mastellone impulsado por Oracle Cloud Infrastructure & AI Vector Database.")
 
     username     = st.session_state["username"]
     language     = st.session_state["language"]
@@ -275,7 +277,8 @@ if login:
                     image_bytes = base64.b64decode(chat_human_prompt_image_message)
                     st.image(image_bytes, width="stretch")
 
-            with st.chat_message("ai", avatar="images/llm_meta.svg"):
+            #with st.chat_message("ai", avatar="images/llm_meta.svg"):
+            with placeholder.chat_message("ai", avatar="images/vaca_robot_mastellone.png"):
                 st.markdown(chat_ai_answer_message)
                 annotated_text(
                     annotation("Rate", chat_tokens_rate_message, background="#484c54", color="#ffffff"),
@@ -286,12 +289,12 @@ if login:
 
         # Manejo del input del usuario
         chat_human_prompt_input = st.chat_input(
-            "Type your message here...",
+            "Escribe tu mensaje aquí....",
             disabled=(not st.session_state["chat-objects"])
             )
 
         if not st.session_state["chat-objects"]:
-            st.info("Please select at least one object to start the chat.")
+            #st.info("Por favor selecciona al menos un documento para iniciar el chat.")
 
         if chat_human_prompt_input:
             st.chat_message("human", avatar=":material/psychology:").write(chat_human_prompt_input)
