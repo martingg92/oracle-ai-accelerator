@@ -1,9 +1,12 @@
+"""
+Login Component - Mastellone/Serenísima Theme
+Oracle AI Accelerator v2.0.4
+
+Diseño: Tarjeta verde centrada con logo "S", badges y formulario
+"""
+
 import ast
-import pandas as pd
 import streamlit as st
-import json
-import time
-import random
 from datetime import datetime
 
 import services.database as database
@@ -16,7 +19,7 @@ db_agent_service = database.AgentService()
 db_quiz_service = database.QuizService()
 db_file_service = database.FileService()
 
-# 👇 AGREGAR ESTA FUNCIÓN
+
 def load_mastellone_css():
     """Carga el tema CSS de Mastellone/Serenísima"""
     try:
@@ -25,386 +28,429 @@ def load_mastellone_css():
     except FileNotFoundError:
         pass
 
+
+def load_login_css():
+    """CSS específico para la página de login con diseño verde centrado"""
+    st.markdown("""
+    <style>
+    /* ================================================================
+       LOGIN PAGE - Mastellone/Serenísima Design
+       Tarjeta verde centrada con gradiente
+       ================================================================ */
+    
+    /* Ocultar elementos de Streamlit en login */
+    .login-page header[data-testid="stHeader"],
+    .login-page footer,
+    .login-page #MainMenu {
+        display: none !important;
+    }
+    
+    /* Contenedor principal del login */
+    .login-card {
+        max-width: 420px;
+        margin: 2rem auto;
+        padding: 2.5rem 2rem;
+        background: linear-gradient(160deg, #009639 0%, #007A2F 50%, #005A22 100%);
+        border-radius: 24px;
+        box-shadow: 
+            0 20px 60px rgba(0, 0, 0, 0.4),
+            0 0 40px rgba(0, 150, 57, 0.15),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Efecto de brillo sutil */
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -50%;
+        width: 200%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.03),
+            transparent
+        );
+        pointer-events: none;
+    }
+    
+    /* Logo circular con "S" */
+    .login-logo {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 
+            0 8px 24px rgba(0, 0, 0, 0.3),
+            inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        position: relative;
+    }
+    
+    .login-logo span {
+        color: white;
+        font-family: 'Segoe UI', 'Poppins', sans-serif;
+        font-size: 3rem;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Título principal */
+    .login-title {
+        color: white;
+        font-family: 'Segoe UI', 'Poppins', sans-serif;
+        font-weight: 700;
+        font-size: 1.75rem;
+        line-height: 1.3;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Subtítulo */
+    .login-subtitle {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+        font-weight: 400;
+    }
+    
+    /* Contenedor de badges */
+    .login-badges {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 1.75rem;
+    }
+    
+    .login-badge {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 50px;
+        padding: 0.4rem 0.85rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        transition: all 0.2s ease;
+    }
+    
+    .login-badge:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-1px);
+    }
+    
+    /* Labels del formulario */
+    .login-label {
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-align: left;
+        display: block;
+        margin-bottom: 0.4rem;
+        margin-top: 0.75rem;
+    }
+    
+    /* Estilos para inputs dentro del login */
+    .login-card .stTextInput > div > div > input {
+        background: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.875rem 1rem !important;
+        font-size: 1rem !important;
+        color: #333 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .login-card .stTextInput > div > div > input::placeholder {
+        color: #999 !important;
+    }
+    
+    .login-card .stTextInput > div > div > input:focus {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(255, 255, 255, 0.4) !important;
+        outline: none !important;
+    }
+    
+    /* Select/Dropdown */
+    .login-card .stSelectbox > div > div {
+        background: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .login-card .stSelectbox > div > div > div {
+        color: #333 !important;
+    }
+    
+    /* Botón de login */
+    .login-card .stButton > button {
+        width: 100%;
+        background: white !important;
+        color: #009639 !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.875rem 1.5rem !important;
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+        margin-top: 1.25rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer;
+    }
+    
+    .login-card .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    .login-card .stButton > button:active {
+        transform: translateY(0) !important;
+    }
+    
+    /* Footer del login */
+    .login-footer {
+        margin-top: 1.75rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.8rem;
+    }
+    
+    /* Mensaje de error */
+    .login-card .stAlert {
+        background: rgba(231, 76, 60, 0.2) !important;
+        border: 1px solid rgba(231, 76, 60, 0.4) !important;
+        border-radius: 10px !important;
+        color: white !important;
+        margin-top: 1rem;
+    }
+    
+    /* Ocultar labels de Streamlit dentro del login */
+    .login-card .stTextInput > label,
+    .login-card .stSelectbox > label {
+        display: none !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+
 def parse_modules(modules):
     """
     Parse modules from a JSON-like string or a comma-separated string.
-
-    Args:
-        modules (str): A string representing modules in JSON or comma-separated format.
-
-    Returns:
-        list: A list of module names.
     """
     try:
-        # Handle Python-style string list
         return ast.literal_eval(modules)
     except (ValueError, SyntaxError):
-        # Fallback to comma-separated format
         return [m.strip().strip('"') for m in modules.strip('[]').split(',')]
+
 
 def get_menu(modules, user):
     """
     Build and display the sidebar menu based on the user's modules.
-
-    Args:
-        modules (str): The user's accessible modules.
-        user (str): The user's name to display in the sidebar.
     """
-    module_list = parse_modules(modules)  # Parse the module list correctly
+    module_list = parse_modules(modules)
     
     with st.sidebar:
-        st.image("images/st_pages.gif")        
-        st.markdown("## :red[Oracle AI] Accelerator :gray-badge[:material/smart_toy: " + global_version + "]")
+        # Header con versión
+        st.markdown(f"""
+        <div style="padding: 0.5rem 0;">
+            <span style="color: #FF0000; font-weight: 700;">Oracle AI</span>
+            <span style="color: white; font-weight: 600;">Accelerator</span>
+            <span style="
+                background: #3A3B46;
+                color: #B0B0B0;
+                padding: 2px 8px;
+                border-radius: 10px;
+                font-size: 0.7rem;
+                margin-left: 0.5rem;
+            ">v{global_version}</span>
+        </div>
+        """, unsafe_allow_html=True)
         
-        # 👇 Logo Serenísima DESTACADO con borde verde (el CSS hace el resto)
-        st.image("images/logo_SE.png", use_container_width=True)
+        # Logo Serenísima con diseño mejorado
+        st.markdown("""
+        <div style="
+            background: white;
+            border: 3px solid #009639;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 1rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 150, 57, 0.2);
+        ">
+            <div style="
+                width: 60px;
+                height: 60px;
+                background: linear-gradient(135deg, #009639 0%, #006B2D 100%);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 8px;
+            ">
+                <span style="color: white; font-size: 2rem; font-weight: 700;">S</span>
+            </div>
+            <div style="color: #009639; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">
+                SERENÍSIMA
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
         
-        st.write(f"Hi, **:blue-background[{user}]**")
+        # Usuario actual
+        st.markdown(f"""
+        <div style="
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+        ">
+            <span style="color: #B0B0B0; font-size: 0.85rem;">Hola,</span><br>
+            <span style="color: #009639; font-weight: 600; font-size: 1rem;">{user}</span>
+        </div>
+        """, unsafe_allow_html=True)
 
-        # Always shown links
-        st.page_link("app.py", label="Knowledge", icon=":material/book_ribbon:")
+        # Navegación principal
+        st.page_link("app.py", label="Knowledge", icon="📚")
         
-        # Agents solo si tiene módulos con vector store
-        #if "Vector Database" in st.session_state.get("modules", ""):
-        #    st.page_link("pages/app_agents.py", label="Agents", icon=":material/smart_toy:")
-        #    st.page_link("pages/app_agent_builder.py", label="Agent Builder", icon=":material/flowchart:")
-        
-        # Quiz solo si tiene el módulo 8
         if "Quiz" in st.session_state.get("modules", ""):
-            st.page_link("pages/app_quiz.py", label="Quiz", icon=":material/quiz:")
-        #st.page_link("pages/app_speech.py", label="Voice Chat", icon=":material/mic:")
+            st.page_link("pages/app_quiz.py", label="Quiz", icon="📝")
 
         # AI Demos Section
         ai_demos = [
-            ("AI Speech Real-Time", "pages/app_speech.py", ":material/mic:"),
-            ("Select AI", "pages/app_chat_01.py", ":material/smart_toy:"),
-            ("Select AI RAG", "pages/app_chat_02.py", ":material/plagiarism:"),
-            ("Vector Database", "pages/app_chat_03.py", ":material/network_intelligence:")
+            ("AI Speech Real-Time", "pages/app_speech.py", "🎤"),
+            ("Select AI", "pages/app_chat_01.py", "🤖"),
+            ("Select AI RAG", "pages/app_chat_02.py", "🔍"),
+            ("Vector Database", "pages/app_chat_03.py", "💬")
         ]
         available_demos = [demo for demo in ai_demos if demo[0] in module_list]
 
         if available_demos:
             for label, page, icon in available_demos:
                 display_label = "Chat Mastellone" if label == "Vector Database" else label
-                #st.page_link(page, label=label, icon=icon)
                 st.page_link(page, label=display_label, icon=icon)
         
         # Settings Section
-        st.subheader("Settings")
+        st.markdown("""
+        <div style="color: #009639; font-weight: 600; font-size: 0.8rem; margin-top: 1.5rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">
+            CONFIGURACIÓN
+        </div>
+        """, unsafe_allow_html=True)
+        
         if "Administrator" in module_list:
-            st.page_link("pages/app_users.py", label="Users", icon=":material/settings_account_box:")
-            st.page_link("pages/app_user_group.py", label="User Group", icon=":material/group:")
-        st.page_link("pages/app_profile.py", label="Profile", icon=":material/manage_accounts:")
+            st.page_link("pages/app_users.py", label="Users", icon="👥")
+            st.page_link("pages/app_user_group.py", label="User Group", icon="👨‍👩‍👧‍👦")
+        st.page_link("pages/app_profile.py", label="Perfil", icon="👤")
         
-        # Reports Section (only for Administrators)
+        # Reports Section
         if "Administrator" in module_list:
-            st.subheader("Reports")
-            st.page_link("pages/app_quiz_report.py", label="Quiz Reports", icon=":material/analytics:")
+            st.markdown("""
+            <div style="color: #009639; font-weight: 600; font-size: 0.8rem; margin-top: 1.5rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                REPORTES
+            </div>
+            """, unsafe_allow_html=True)
+            st.page_link("pages/app_quiz_report.py", label="Quiz Reports", icon="📊")
+
+        # Espacio flexible
+        st.markdown("<div style='flex-grow: 1; min-height: 2rem;'></div>", unsafe_allow_html=True)
         
-        st.subheader("Options")
+        # Powered by Oracle AI badge
+        st.markdown("""
+        <div style="
+            background: linear-gradient(135deg, #FF0000, #CC0000);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        ">
+            ⚡ Powered by ORACLE AI
+        </div>
+        """, unsafe_allow_html=True)
         
-        
-        if st.session_state["page"] == "app_chat_01.py":
-            with st.container(border=True, key="options_select_ai_container"):
-            
-                # Widgets shared by all the pages
-                user_id = st.session_state["user_id"]
-                df_agents = db_agent_service.get_all_agents_cache(user_id, force_update=True)
-                df_agents = df_agents[df_agents["AGENT_TYPE"] == "Analytics"]
-
-                # Modo de acción para Select AI (narrate/showsql/explainsql)
-                action_options = ["narrate", "showsql", "explainsql", "runsql", "chat"]
-                st.selectbox(
-                    "Select AI Action",
-                    options=action_options,
-                    index=action_options.index(st.session_state.get("select_ai_action", "narrate"))
-                    if st.session_state.get("select_ai_action", "narrate") in action_options
-                    else 0,
-                    key="select_ai_action"
-                )
-                
-                st.checkbox("Analytics Agent", False, key="analytics_agent")
-                # Deshabilitamos el uso del Explain Agent; mantener la clave en False evita regresiones
-                st.session_state["sql_explain_agent"] = False
-
-                # Selección de agente visible solo cuando Analytics Agent está activo
-                analytics_enabled = st.session_state.get("analytics_agent", False)
-                if analytics_enabled and not df_agents.empty:
-                    st.selectbox(
-                        "Select an Agent",
-                        options=df_agents["AGENT_ID"],
-                        format_func=lambda agent_id: f"{agent_id}: {df_agents.loc[df_agents['AGENT_ID'] == agent_id, 'AGENT_NAME'].values[0]}",
-                        index=0,
-                        key="selected_agent_id"
-                    )
-                elif not analytics_enabled:
-                    # Evitamos estados inconsistentes cuando se desactiva el modo Analytics
-                    st.session_state["selected_agent_id"] = st.session_state.get("selected_agent_id")
-
-                col1, col2, = st.columns(2)
-
-                with col1:
-                    if st.button(key="clear", help="Clear Chat", label="", icon=":material/delete:", disabled=(not st.session_state["chat-select-ai"]), width="stretch"):
-                        st.session_state["chat-select-ai"] = []
-                        st.rerun()
-
-                with col2:
-                    st.download_button(
-                        key="Save",
-                        label="",
-                        help="Save Chat",
-                        icon=":material/download:",
-                        data=json.dumps([
-                            {k: v for k, v in msg.items() if k not in ("analytics_df", "analytics")}
-                            for msg in st.session_state["chat-select-ai"]
-                        ], indent=4, ensure_ascii=False),
-                        file_name=f"chat_history_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
-                        mime="application/json",
-                        disabled=(not st.session_state["chat-select-ai"]), 
-                        width="stretch"
-                    )
-
-        if st.session_state["page"] == "app_agent_builder.py":
-            with st.container(border=True, key="options_agent_builder_container"):
-
-                def queue_agent_builder_action(action_type: str):
-                    st.session_state['agent_builder_pending_action'] = {
-                        "type": action_type,
-                        "timestamp": datetime.now().isoformat()
-                    }
-            
-                if st.button("Add Tool", key="sidebar_add_tool", icon="🔶", width="stretch"):
-                    queue_agent_builder_action('TOOL')
-                    st.rerun()
-            
-                if st.button("Add Task", key="sidebar_add_task", icon="🟢", width="stretch"):
-                    queue_agent_builder_action('TASK')
-                    st.rerun()
-
-            
-                if st.button("Add Agent", key="sidebar_add_agent", icon="🟦", width="stretch"):
-                    queue_agent_builder_action('AGENT')
-                    st.rerun()
-            
-                if st.button("Add Team", key="sidebar_add_team", icon="🔴", width="stretch"):
-                    queue_agent_builder_action('TEAM')
-                    st.rerun()
-        
-        if st.session_state["page"] == "app_speech.py":
-            with st.container(border=True, key="options_speech_container"):
-                
-                # Get user agents for voice chat
-                user_id = st.session_state["user_id"]
-                df_agents = db_agent_service.get_all_agents_cache(user_id, force_update=False)
-                df_agents = df_agents[df_agents["AGENT_TYPE"] == "Voice"]
-                
-                if not df_agents.empty:
-                    # Disable agent selection if Select AI is enabled
-                    use_select_ai = st.session_state.get("speech_use_select_ai", False)
-                    st.selectbox(
-                        "Select an Agent",
-                        options=df_agents["AGENT_ID"],
-                        format_func=lambda agent_id: f"{agent_id}: {df_agents.loc[df_agents['AGENT_ID'] == agent_id, 'AGENT_NAME'].values[0]}",
-                        key="speech_agent_id",
-                        disabled=use_select_ai
-                    )
-                
-                # Language selector
-                language_options = ["Spanish", "Portuguese", "English"]
-                current_language = st.session_state.get("language", "Spanish")
-                default_index = language_options.index(current_language) if current_language in language_options else 0
-                
-                st.selectbox(
-                    "Language",
-                    options=language_options,
-                    index=default_index,
-                    key="speech_language"
-                )
-                
-                # Select AI checkbox
-                st.checkbox(
-                    "Select AI",
-                    value=st.session_state.get("speech_use_select_ai", False),
-                    key="speech_use_select_ai",
-                    help="Use Select AI to answer queries based on database tables instead of the configured voice agent"
-                )
-                
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    if st.button(
-                        key="clear_speech",
-                        help="Clear Conversation",
-                        label="",
-                        icon=":material/delete:",
-                        disabled=(not st.session_state.get("speech_conversation", [])),
-                        width="stretch"
-                    ):
-                        st.session_state["speech_conversation"] = []
-                        st.session_state["speech_current_partial"] = ""
-                        st.session_state["speech_processing_llm"] = False
-                        st.rerun()
-                
-                with col2:
-                    if st.session_state.get("speech_conversation", []):
-                        history_json = json.dumps(
-                            st.session_state["speech_conversation"],
-                            indent=4,
-                            ensure_ascii=False
-                        )
-                        st.download_button(
-                            key="save_speech",
-                            label="",
-                            help="Save Conversation",
-                            icon=":material/download:",
-                            data=history_json,
-                            file_name=f"voice_chat_{datetime.now().strftime('%H%M%S%f')}.json",
-                            mime="application/json",
-                            width="stretch"
-                        )
-                    else:
-                        st.button(
-                            key="save_speech_disabled",
-                            label="",
-                            help="Save Conversation",
-                            icon=":material/download:",
-                            disabled=True,
-                            width="stretch"
-                        )
-        
-        if st.session_state["page"] == "app_quiz.py":
-            with st.container(border=True, key="options_quiz_container"):
-                user_id = st.session_state.get("user_id")
-                df_files = db_file_service.get_all_files(user_id) if user_id else None
-                df_quiz_files = df_files[df_files["MODULE_ID"] == 8] if df_files is not None and not df_files.empty else None
-                
-                if df_quiz_files is None or df_quiz_files.empty:
-                    st.info("No quizzes available. Please contact the administrator.", icon=":material/info:")
-                else:
-                    quiz_running = st.session_state.get("quiz_started", False) and not st.session_state.get("quiz_finished", False)
-                    quiz_finished = st.session_state.get("quiz_finished", False)
-                    
-                    # Show selector only when quiz is not running/finished
-                    if not quiz_running and not quiz_finished:
-                        selected_file_id = st.selectbox(
-                            "Select Quiz",
-                            options=df_quiz_files["FILE_ID"].tolist(),
-                            format_func=lambda fid: f"{df_quiz_files.loc[df_quiz_files['FILE_ID'] == fid, 'FILE_DESCRIPTION'].values[0]}",
-                            key="quiz_selected_file_id"
-                        )
-                        df_all_questions_sidebar = db_quiz_service.get_quiz_questions(selected_file_id)
-                        st.caption(f"Total available questions: **{len(df_all_questions_sidebar)}**")
-                    
-                    # Quiz in progress - show info and Leave button
-                    elif quiz_running:
-                        st.markdown("**Evaluation in Progress**")
-                        
-                        # Evaluation name
-                        st.caption(f"{st.session_state.get('quiz_evaluation_name', '')}")
-                        
-                        # Timer
-                        if st.session_state.get("quiz_start_time"):
-                            elapsed = int(time.time() - st.session_state["quiz_start_time"])
-                            st.metric(
-                                "Elapsed Time",
-                                f"{elapsed // 60}:{elapsed % 60:02d}",
-                                delta=None
-                            )
-                        
-                        # Leave Quiz button
-                        if st.button("Leave Quiz", type="secondary", icon=":material/cancel:", width="stretch"):
-                            if st.session_state.get("quiz_confirm_abandon", False):
-                                st.session_state["quiz_started"] = False
-                                st.session_state["quiz_finished"] = False
-                                st.session_state["quiz_confirm_abandon"] = False
-                                st.rerun()
-                            else:
-                                st.session_state["quiz_confirm_abandon"] = True
-                                st.warning("Click again to confirm")
-                    
-                    # Quiz finished - show score and reset button
-                    elif quiz_finished:
-                        answers = st.session_state.get("quiz_answers", {})
-                        if answers:
-                            correct = sum(1 for ans in answers.values() if ans["is_correct"] == 1)
-                            total = len(answers)
-                            st.metric("Score", f"{(correct/total)*100:.1f}%")
-                        
-                        # Take Another Quiz button
-                        if st.button("Take Quiz", type="primary", icon=":material/refresh:", width="stretch"):
-                            # Clear all quiz-related keys
-                            for key in list(st.session_state.keys()):
-                                if key.startswith("quiz_") or key.startswith("saved_option_"):
-                                    del st.session_state[key]
-                            st.rerun()
-
         # Sign out button
-        if st.button(":material/exit_to_app: Sign out", type="secondary"):
-            st.set_page_config(layout="centered")
-            st.set_page_config(initial_sidebar_state="collapsed")
+        st.markdown("<div style='margin-top: 1rem;'></div>", unsafe_allow_html=True)
+        if st.button("🚪 Cerrar sesión", type="secondary", use_container_width=True):
             st.cache_data.clear()
             st.cache_resource.clear()
             st.session_state.clear()
             st.rerun()
 
-def get_login():
-    """
-    Handle the login process and render the appropriate menu.
-    """
-    # 👇 CARGAR CSS PERSONALIZADO
-    load_mastellone_css()
+
+def render_login_form():
+    """Renderiza el formulario de login con el nuevo diseño verde"""
     
-    if all(k in st.session_state for k in ["username", "user", "user_id", "modules", "chat-history", "chat-save"]):
-        get_menu(st.session_state["modules"], st.session_state["user"])
-        return True
-    else:
-        # Login Form
-        with st.form('form-login'):
-
-            st.markdown("## :red[Oracle AI] Accelerator :gray-badge[:material/smart_toy: " + global_version + "]")
-
-            col1, col2 = st.columns(2)
-            with col1:
-                st.image("images/st_login.gif")
-                st.markdown(
-                    ":gray-badge[:material/smart_toy: Agents] "
-                    ":gray-badge[:material/database: Autonomous 26ai] "
-                    ":gray-badge[:material/database_search: Select AI] "
-                    ":gray-badge[:material/plagiarism: Select AI RAG] "
-                    ":gray-badge[:material/psychology: Generative AI] "
-                    ":gray-badge[:material/privacy_tip: PII Detection] "
-                    ":gray-badge[:material/flowchart: Agent Builder] "
-                    ":gray-badge[:material/mic: AI Speech STT/TTS RealTime] "
-                    ":gray-badge[:material/description: Document Understanding] "
-                )
-            with col2:                
-                username = st.text_input('Username')
-                password = st.text_input('Password', type='password')
-                # Selectbox: Laguage
-                language = st.selectbox(
-                    "Language",
-                    options=("Spanish", "Portuguese", "English")
-                )
-                language_message = None
-                match language:
-                    case "Spanish":
-                        language_message = "No tengo esa información."
-                    case "Portuguese":
-                        language_message = "Não tenho essa informação."
-                    case "English":
-                        language_message = "I don't have that information."
-
-                btn_login = st.form_submit_button('Login', type='primary')
-
-            if btn_login:
+    load_login_css()
+    
+    # Inicio del contenedor HTML
+    st.markdown("""
+    <div class="login-card">
+        <div class="login-logo">
+            <span>S</span>
+        </div>
+        <h1 class="login-title">Asistente Virtual<br>Serenísima</h1>
+        <p class="login-subtitle">Powered by Oracle AI Accelerator v2.0.4</p>
+        
+        <div class="login-badges">
+            <span class="login-badge">🤖 Agents</span>
+            <span class="login-badge">📊 Vector DB</span>
+            <span class="login-badge">✨ Generative AI</span>
+            <span class="login-badge">🔍 RAG</span>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Formulario de Streamlit
+    with st.form('form-login', clear_on_submit=False):
+        st.markdown('<span class="login-label">Usuario</span>', unsafe_allow_html=True)
+        username = st.text_input('Usuario', placeholder='Ingresa tu usuario', label_visibility='collapsed')
+        
+        st.markdown('<span class="login-label">Contraseña</span>', unsafe_allow_html=True)
+        password = st.text_input('Contraseña', type='password', placeholder='Ingresa tu contraseña', label_visibility='collapsed')
+        
+        st.markdown('<span class="login-label">Idioma</span>', unsafe_allow_html=True)
+        language = st.selectbox(
+            "Idioma",
+            options=["Español", "English", "Português"],
+            label_visibility='collapsed'
+        )
+        
+        # Mapeo de idiomas
+        language_map = {
+            "Español": "Spanish",
+            "English": "English", 
+            "Português": "Portuguese"
+        }
+        language_internal = language_map.get(language, "Spanish")
+        
+        language_message_map = {
+            "Spanish": "No tengo esa información.",
+            "Portuguese": "Não tenho essa informação.",
+            "English": "I don't have that information."
+        }
+        language_message = language_message_map.get(language_internal, "No tengo esa información.")
+        
+        btn_login = st.form_submit_button('Ingresar', type='primary', use_container_width=True)
+        
+        if btn_login:
+            if not username or not password:
+                st.error("Por favor ingresa usuario y contraseña")
+            else:
                 df = db_user_service.get_access(username, password)
-
+                
                 if df is not None and not df.empty:
                     user_state = df['USER_STATE'].iloc[0]
-
-                    # Check if user is deactivate
+                    
                     if user_state == 1:
-                        # Set session state
                         st.session_state.update({
                             'page'               : "app.py",
                             'user_id'            : int(df['USER_ID'].iloc[0]),
@@ -412,7 +458,7 @@ def get_login():
                             'modules'            : df['MODULE_NAMES'].iloc[0],
                             'username'           : df['USER_USERNAME'].iloc[0],
                             'user'               : f"{df['USER_NAME'].iloc[0]}, {df['USER_LAST_NAME'].iloc[0]}",
-                            'language'           : language,
+                            'language'           : language_internal,
                             'language-message'   : language_message,
                             'chat-select-ai'     : [],
                             'chat-select-ai-rag' : [],
@@ -425,11 +471,31 @@ def get_login():
                             'ai-agent'           : None
                         })
                         st.switch_page("app.py")
-                    
                     else:
-                        st.error("This user is deactivated.", icon=":material/gpp_maybe:")
-                
+                        st.error("Este usuario está desactivado.")
                 else:
-                    st.error("Invalid username or password", icon=":material/gpp_maybe:")
-        
+                    st.error("Usuario o contraseña incorrectos")
+    
+    # Footer del login
+    st.markdown("""
+        <div class="login-footer">
+            Oracle AI Accelerator · v2.0.4 · Mastellone Hnos. S.A.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+def get_login():
+    """
+    Handle the login process and render the appropriate menu.
+    """
+    # Cargar CSS personalizado
+    load_mastellone_css()
+    
+    if all(k in st.session_state for k in ["username", "user", "user_id", "modules", "chat-history", "chat-save"]):
+        get_menu(st.session_state["modules"], st.session_state["user"])
+        return True
+    else:
+        # Mostrar formulario de login
+        render_login_form()
         return False
