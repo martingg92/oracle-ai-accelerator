@@ -65,7 +65,7 @@ if login:
 
         # Display module options as pills
         modules = st.pills(
-            "Modules",
+            "Módulos",
             options        = df_modules["MODULE_ID"],
             format_func    = lambda module_id: f"{df_modules.loc[df_modules['MODULE_ID'] == module_id, 'MODULE_NAME'].values[0]}",
             selection_mode = "multi",
@@ -75,14 +75,14 @@ if login:
 
         # Display status options as pills
         state = st.pills(
-            "Status",
+            "Estado",
             options     = list(map_user_state.keys()),
             format_func = lambda state_id: map_user_state[state_id],
             default     = original_data["state"]
         )
 
         # Submit button
-        if st.form_submit_button("Update", type="primary"):
+        if st.form_submit_button("Actualizar", type="primary"):
             try:
                 component.get_processing(True)
                 
