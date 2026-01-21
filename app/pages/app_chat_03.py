@@ -73,8 +73,8 @@ if login:
     )
     
     # Header y descripción
-    st.header(":material/network_intelligence: Vector Database")
-    st.caption("AI Vector Search enables semantic and value-based searches on business data, enhancing LLM performance and RAG use cases securely and efficiently.")
+    st.header(":material/network_intelligence: Chat Mastellone")
+    st.caption("Búsquedas semánticas habilitadas con documentos de Mastellone")
 
     username     = st.session_state["username"]
     language     = st.session_state["language"]
