@@ -69,8 +69,10 @@ if login:
         utl_function_service          = utils.FunctionService()
         db_user_service               = database.UserService()
         db_quiz_service               = database.QuizService()
-        st.header(":material/book_ribbon: Knowledge")
-        st.caption("Manage Knowledge")
+        #st.header(":material/book_ribbon: Knowledge")
+        st.header(":material/book_ribbon: Base de Conocimiento Mastellone")
+        #st.caption("Manage Knowledge")
+        st.caption("Administra documentos para el Asistente Virtual Serenísima.")
         st.set_page_config(layout="wide")
         st.set_page_config(initial_sidebar_state="expanded")
         
