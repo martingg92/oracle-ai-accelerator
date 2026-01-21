@@ -1,34 +1,16 @@
-/* ================================================================
-   MASTELLONE/SERENÍSIMA THEME - DARK MODE WITH GREEN ACCENTS
-   Oracle AI Accelerator v2.0.4
-   
-   Este tema mantiene el fondo oscuro original y aplica colores
-   verde Serenísima estratégicamente para la identidad de marca.
-   ================================================================ */
-
+/* Mastellone/Serenísima Dark Theme */
 :root {
-    /* Serenísima Brand Colors */
     --serenisima-green: #009639;
     --serenisima-dark: #006B2D;
     --serenisima-light: #E8F5E9;
-    --serenisima-accent: #4CAF50;
-    
-    /* Oracle Colors (secondary) */
-    --oracle-red: #FF0000;
-    --oracle-red-dark: #CC0000;
-    
-    /* Dark Theme (mantener original) */
-    --bg-dark: #1E1E1E;
-    --bg-sidebar: #2B2D31;
-    --bg-card: #3A3B46;
-    --text-primary: #FFFFFF;
-    --text-secondary: #B0B0B0;
 }
 
-/* ================================================================
-   SIDEBAR - Logo Serenísima destacado
-   ================================================================ */
+/* Headers en verde */
+h1, h2 {
+    color: var(--serenisima-green) !important;
+}
 
+/* Sidebar logo destacado */
 [data-testid="stSidebar"] [data-testid="stImage"] {
     border: 3px solid var(--serenisima-green);
     border-radius: 10px;
@@ -38,7 +20,7 @@
     box-shadow: 0 4px 12px rgba(0, 150, 57, 0.3);
 }
 
-/* Sidebar hover states en verde */
+/* Sidebar hover verde */
 [data-testid="stSidebar"] a:hover {
     background-color: rgba(0, 150, 57, 0.15) !important;
     border-left: 4px solid var(--serenisima-green) !important;
@@ -52,177 +34,44 @@
     padding-left: 16px !important;
 }
 
-/* Sidebar section titles en verde */
-[data-testid="stSidebar"] h3 {
-    color: var(--serenisima-green) !important;
-}
-
-/* ================================================================
-   HEADERS - Títulos en verde
-   ================================================================ */
-
-h1, h2 {
-    color: var(--serenisima-green) !important;
-}
-
-/* ================================================================
-   BUTTONS PRIMARY - Verde Serenísima
-   ================================================================ */
-
+/* Botones primary verde */
 .stButton button[kind="primary"],
 button[kind="primary"],
 [data-testid="stFormSubmitButton"] button {
     background: linear-gradient(135deg, var(--serenisima-green), var(--serenisima-dark)) !important;
     color: white !important;
-    border: none !important;
-    font-weight: 600 !important;
-    transition: all 0.3s ease !important;
 }
 
-.stButton button[kind="primary"]:hover,
-button[kind="primary"]:hover,
-[data-testid="stFormSubmitButton"] button:hover {
-    opacity: 0.9 !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 12px rgba(0, 150, 57, 0.4) !important;
-}
-
-/* ================================================================
-   INPUT FOCUS - Borde verde al hacer focus
-   ================================================================ */
-
-input:focus, 
-textarea:focus, 
-select:focus,
-[data-baseweb="select"]:focus-within {
-    border-color: var(--serenisima-green) !important;
-    box-shadow: 0 0 0 2px rgba(0, 150, 57, 0.2) !important;
-}
-
-/* ================================================================
-   CHAT INTERFACE - Mensajes del bot en verde claro
-   ================================================================ */
-
-/* Chat Input con borde verde */
+/* Chat input borde verde */
 .stChatInput,
-[data-testid="stChatInput"],
-[data-testid="stChatInputContainer"] {
+[data-testid="stChatInput"] {
     border: 2px solid var(--serenisima-green) !important;
 }
 
-.stChatInput:focus-within,
-[data-testid="stChatInput"]:focus-within,
-[data-testid="stChatInputContainer"]:focus-within {
-    box-shadow: 0 0 0 2px rgba(0, 150, 57, 0.2) !important;
-}
-
-/* Mensajes del bot con fondo verde claro */
+/* Mensajes del bot verde claro */
 [data-testid="stChatMessage"]:not([data-testid*="user"]) {
     background-color: var(--serenisima-light) !important;
     border-left: 4px solid var(--serenisima-green) !important;
 }
 
-/* Texto del bot en color oscuro para contrastar con fondo claro */
 [data-testid="stChatMessage"]:not([data-testid*="user"]) * {
     color: #1E1E1E !important;
 }
 
-/* ================================================================
-   ALERTS - Info banners en verde
-   ================================================================ */
+/* Input focus verde */
+input:focus, textarea:focus, select:focus {
+    border-color: var(--serenisima-green) !important;
+    box-shadow: 0 0 0 2px rgba(0, 150, 57, 0.2) !important;
+}
 
-.stAlert[data-baseweb="notification"],
-[data-testid="stNotification"] {
+/* Info banners verde */
+.stAlert, .stInfo {
     background-color: var(--serenisima-light) !important;
     border-left: 4px solid var(--serenisima-green) !important;
     color: var(--serenisima-dark) !important;
 }
 
-.stInfo {
-    background-color: var(--serenisima-light) !important;
-    border-left: 4px solid var(--serenisima-green) !important;
-    color: var(--serenisima-dark) !important;
-}
-
-/* ================================================================
-   TABLES - Headers en verde
-   ================================================================ */
-
-[data-testid="stDataFrame"] thead tr th {
-    background-color: var(--serenisima-green) !important;
-    color: white !important;
-}
-
-[data-testid="stDataFrame"] tbody tr:hover {
-    background-color: rgba(0, 150, 57, 0.1) !important;
-}
-
-/* ================================================================
-   PILLS (Multiselect) - Seleccionados en verde
-   ================================================================ */
-
-[data-testid="stPills"] button[aria-selected="true"] {
-    background-color: var(--serenisima-green) !important;
-    color: white !important;
-    border-color: var(--serenisima-green) !important;
-}
-
-[data-testid="stPills"] button:hover {
-    border-color: var(--serenisima-green) !important;
-    background-color: rgba(0, 150, 57, 0.15) !important;
-}
-
-/* ================================================================
-   ANNOTATIONS (Tokens, Rate badges)
-   ================================================================ */
-
-.annotation {
-    background-color: var(--serenisima-green) !important;
-    color: white !important;
-}
-
-/* ================================================================
-   DOWNLOAD BUTTON
-   ================================================================ */
-
-.stDownloadButton button:hover {
-    background-color: rgba(0, 150, 57, 0.15) !important;
-    border-color: var(--serenisima-green) !important;
-}
-
-/* ================================================================
-   EXPANDERS
-   ================================================================ */
-
-[data-testid="stExpander"] summary {
-    color: var(--serenisima-green) !important;
-}
-
-[data-testid="stExpander"]:hover {
-    border-color: var(--serenisima-green) !important;
-}
-
-/* ================================================================
-   METRICS
-   ================================================================ */
-
-[data-testid="stMetric"] label {
-    color: var(--serenisima-green) !important;
-}
-
-/* ================================================================
-   TABS
-   ================================================================ */
-
-[data-baseweb="tab-list"] button[aria-selected="true"] {
-    color: var(--serenisima-green) !important;
-    border-bottom-color: var(--serenisima-green) !important;
-}
-
-/* ================================================================
-   SCROLLBAR - Verde Serenísima
-   ================================================================ */
-
+/* Scrollbar verde */
 ::-webkit-scrollbar-thumb {
     background: var(--serenisima-green) !important;
 }
@@ -231,70 +80,14 @@ select:focus,
     background: var(--serenisima-dark) !important;
 }
 
-/* ================================================================
-   CODE BLOCKS - En contexto de chat
-   ================================================================ */
-
-code {
-    background-color: rgba(0, 150, 57, 0.1) !important;
-    color: var(--serenisima-dark) !important;
-    border: 1px solid var(--serenisima-green) !important;
-}
-
-/* ================================================================
-   LINKS - Verde Serenísima
-   ================================================================ */
-
-a {
-    color: var(--serenisima-accent) !important;
-}
-
-a:hover {
-    color: var(--serenisima-green) !important;
-}
-
-/* ================================================================
-   SUCCESS MESSAGES
-   ================================================================ */
-
-.stSuccess {
-    background-color: var(--serenisima-light) !important;
-    border-left: 4px solid var(--serenisima-green) !important;
-    color: var(--serenisima-dark) !important;
-}
-
-/* ================================================================
-   SELECTBOX HOVER
-   ================================================================ */
-
-[data-baseweb="select"] [role="option"]:hover {
-    background-color: rgba(0, 150, 57, 0.15) !important;
-}
-
-/* ================================================================
-   TOGGLE/CHECKBOX - Verde cuando activo
-   ================================================================ */
-
-[data-testid="stCheckbox"] input:checked + div {
+/* Pills seleccionados verde */
+[data-testid="stPills"] button[aria-selected="true"] {
     background-color: var(--serenisima-green) !important;
+    color: white !important;
 }
 
-/* ================================================================
-   SLIDER - Verde
-   ================================================================ */
-
-[data-baseweb="slider"] [role="slider"] {
+/* Table headers verde */
+[data-testid="stDataFrame"] thead tr th {
     background-color: var(--serenisima-green) !important;
-}
-
-/* ================================================================
-   FILE UPLOADER
-   ================================================================ */
-
-[data-testid="stFileUploader"] section {
-    border-color: var(--serenisima-green) !important;
-}
-
-[data-testid="stFileUploader"] section:hover {
-    background-color: rgba(0, 150, 57, 0.1) !important;
+    color: white !important;
 }
