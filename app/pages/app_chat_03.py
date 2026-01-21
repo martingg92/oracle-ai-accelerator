@@ -277,8 +277,7 @@ if login:
                     image_bytes = base64.b64decode(chat_human_prompt_image_message)
                     st.image(image_bytes, width="stretch")
 
-            #with st.chat_message("ai", avatar="images/llm_meta.svg"):
-            with placeholder.chat_message("ai", avatar="images/vaca_robot_mastellone.png"):
+            with st.chat_message("ai", avatar="images/llm_meta.svg"):
                 st.markdown(chat_ai_answer_message)
                 annotated_text(
                     annotation("Rate", chat_tokens_rate_message, background="#484c54", color="#ffffff"),
@@ -370,7 +369,8 @@ if login:
 
             # Muestra la respuesta en la UI
             placeholder = st.empty()
-            with placeholder.chat_message("ai", avatar="images/llm_meta.svg"):
+            #with placeholder.chat_message("ai", avatar="images/llm_meta.svg"):
+            with placeholder.chat_message("ai", avatar="images/vaca_robot_mastellone.png"):
                 st.markdown(chat_ai_answer_display)
                 
                 # También calculamos los tokens de entrada
