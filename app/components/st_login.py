@@ -16,6 +16,17 @@ db_agent_service = database.AgentService()
 db_quiz_service = database.QuizService()
 db_file_service = database.FileService()
 
+# 👇 AGREGAR ESTA FUNCIÓN
+def load_mastellone_css():
+    """Carga el tema CSS de Mastellone/Serenísima"""
+    try:
+        with open("styles/mastellone_theme.css") as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        pass  # Si no existe el archivo, continuar sin estilos
+
+global_version = "2.0.4"
+
 def parse_modules(modules):
     """
     Parse modules from a JSON-like string or a comma-separated string.
@@ -45,10 +56,9 @@ def get_menu(modules, user):
     
     with st.sidebar:
         st.image("images/st_pages.gif")        
-
         st.markdown("## :red[Oracle AI] Accelerator :gray-badge[:material/smart_toy: " + global_version + "]")
-
-        # 👇 Logo empresa (debajo del gif y la versión, antes del nombre)
+        
+        # 👇 Logo Serenísima DESTACADO con borde verde (el CSS hace el resto)
         st.image("images/logo_SE.png", use_container_width=True)
         
         st.write(f"Hi, **:blue-background[{user}]**")
@@ -343,6 +353,9 @@ def get_login():
     """
     Handle the login process and render the appropriate menu.
     """
+    # 👇 CARGAR CSS PERSONALIZADO
+    load_mastellone_css()
+    
     if all(k in st.session_state for k in ["username", "user", "user_id", "modules", "chat-history", "chat-save"]):
         get_menu(st.session_state["modules"], st.session_state["user"])
         return True
