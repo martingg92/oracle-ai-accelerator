@@ -67,9 +67,9 @@ def get_menu(modules, user):
         st.page_link("app.py", label="Knowledge", icon=":material/book_ribbon:")
         
         # Agents solo si tiene módulos con vector store
-        if "Vector Database" in st.session_state.get("modules", ""):
-            st.page_link("pages/app_agents.py", label="Agents", icon=":material/smart_toy:")
-            st.page_link("pages/app_agent_builder.py", label="Agent Builder", icon=":material/flowchart:")
+        #if "Vector Database" in st.session_state.get("modules", ""):
+        #    st.page_link("pages/app_agents.py", label="Agents", icon=":material/smart_toy:")
+        #    st.page_link("pages/app_agent_builder.py", label="Agent Builder", icon=":material/flowchart:")
         
         # Quiz solo si tiene el módulo 8
         if "Quiz" in st.session_state.get("modules", ""):
