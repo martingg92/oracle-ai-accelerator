@@ -51,7 +51,7 @@ def get_menu(modules, user):
         # 👇 Logo empresa (debajo del gif y la versión, antes del nombre)
         st.image("images/logo_SE.png", use_container_width=True)
         
-        st.write(f"Hi, **:blue-background[{user}]**")
+        st.write(f"Hola, **:blue-background[{user}]**")
 
         # Always shown links
         st.page_link("app.py", label="Knowledge", icon=":material/book_ribbon:")
