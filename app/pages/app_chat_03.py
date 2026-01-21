@@ -294,7 +294,7 @@ if login:
             )
 
         if not st.session_state["chat-objects"]:
-            #st.info("Por favor selecciona al menos un documento para iniciar el chat.")
+            st.info("Por favor selecciona al menos un documento para iniciar el chat.")
 
         if chat_human_prompt_input:
             st.chat_message("human", avatar=":material/psychology:").write(chat_human_prompt_input)
