@@ -5,7 +5,7 @@
         agent_description       VARCHAR2(4000) NOT NULL,
         agent_type              VARCHAR2(250) DEFAULT 'Chat' NOT NULL,
         agent_max_out_tokens    NUMBER DEFAULT 4000 NOT NULL,
-        agent_temperature       NUMBER (1,1) DEFAULT 0.6 NOT NULL,
+        agent_temperature       NUMBER (1,1) DEFAULT 0.2 NOT NULL,
         agent_top_p             NUMBER (3,2) DEFAULT 0.75 NOT NULL,
         agent_top_k             NUMBER (3,0) DEFAULT 20 NOT NULL,
         agent_frequency_penalty NUMBER (3,2) DEFAULT 0 NOT NULL,
