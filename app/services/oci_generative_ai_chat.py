@@ -1,6 +1,7 @@
 import os
 
-from langchain_community.chat_models import ChatOCIGenAI
+#from langchain_community.chat_models import ChatOCIGenAI
+from langchain_oci import ChatOCIGenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 
