@@ -5,10 +5,10 @@ oracledb==3.1.0
 pandas==2.2.3
 PyMuPDF==1.25.5
 
-langchain==0.3.18
-langchain-core==0.3.34
-langchain-community==0.3.17
-langchain-oci==0.2.2
+langchain>=0.3.0
+langchain-community>=0.3.30
+langchain-oci>=0.2.2
+langchain-core>=0.3.0
 
 pydantic==2.10.6
 pydantic-settings==2.8.1
