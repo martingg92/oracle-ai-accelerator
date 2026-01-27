@@ -242,7 +242,7 @@ Your task is to provide the most accurate transcription possible. Return `**[Unr
         agent_prompt_message)
     VALUES (
         5,
-        7,
+        12,
         'Document Agent',
         'Performs contextual question-answering on unstructured documents.',
         'Chat',
