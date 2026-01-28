@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 import streamlit as st
 from streamlit_float import *
+from typing import List
 
 from annotated_text import annotated_text, annotation
 #from langchain_community.chat_message_histories import StreamlitChatMessageHistory
