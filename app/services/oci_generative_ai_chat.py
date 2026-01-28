@@ -110,10 +110,9 @@ class GenerativeAIService:
 
         # Creamos el retriever base (filtro por file_id)
         context_retriever = vector_store.as_retriever(
-            search_type="mmr",
+            search_type="similarity",
             search_kwargs={
-                "k": 10,         # Número de chunks relevantes que se devuelven
-                "fetch_k": 20,   # Número de candidatos iniciales desde los cuales aplicar MMR
+                "k": 5,         # Número de chunks relevantes que se devuelven
                 "filter": {"file_id": file_id} # Limita la búsqueda al archivo específico
             }
         )
