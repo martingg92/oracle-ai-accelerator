@@ -52,10 +52,7 @@ def create_history_aware_retriever(llm, retriever, prompt):
             lambda x: len(x.get("chat_history", [])) > 0, 
             rephrase_chain | retriever
         ),
-        (
-            lambda x: True, # Caso por defecto (sin historial)
             (lambda x: x["input"]) | retriever
-        )
     )
 
 def create_retrieval_chain(retriever, combine_docs_chain):
