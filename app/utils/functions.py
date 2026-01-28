@@ -12,7 +12,8 @@ from typing import List, Tuple
 from dotenv import load_dotenv
 
 # Para ChatMessages
-from langchain.schema import HumanMessage, AIMessage
+#from langchain.schema import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage
 
 load_dotenv()
 
