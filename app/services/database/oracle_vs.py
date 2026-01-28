@@ -6,6 +6,8 @@ import oracledb
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStore
 from langchain_core.documents import Document
+import array
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +36,6 @@ class OracleVS(VectorStore):
         metadatas: Optional[List[dict]] = None,
         **kwargs: Any,
     ) -> List[str]:
-        # Implementación simplificada para inserción si la necesitas
-        # (Para RAG de lectura, el método crítico es similarity_search)
         return []
 
     def similarity_search(
@@ -44,33 +44,49 @@ class OracleVS(VectorStore):
         """Realiza búsqueda vectorial usando Oracle 23ai."""
         embedding = self.embedding_function.embed_query(query)
         
-        # SQL dinámico para búsqueda vectorial en 23ai
-        # Asegúrate de que tu tabla tenga la columna 'vector' tipo VECTOR
+        # --- CORRECCIÓN REALIZADA AQUÍ ---
+        # Antes decía 'vector', ahora usa 'embedding' que es el nombre real 
+        # confirmado en tu archivo j.TABLE_DOCS.sql
         sql = f"""
             SELECT id, text, metadata 
             FROM {self.table_name}
-            ORDER BY VECTOR_DISTANCE(vector, :embedding, {self.distance_strategy})
+            ORDER BY VECTOR_DISTANCE(embedding, :embedding, {self.distance_strategy})
             FETCH FIRST :k ROWS ONLY
         """
         
-        # Convertir embedding a array para oracledb si es necesario
-        # En oracledb 2.0+ y DB 23c, se suele pasar como array.
-        import array
+        # Convertir embedding a array float (requerido por oracledb 2.0+)
         embedding_array = array.array("f", embedding)
 
         cursor = self.client.cursor()
-        cursor.execute(sql, embedding=embedding_array, k=k)
-        
-        docs = []
-        for row in cursor:
-            # Asumiendo estructura: id (0), text (1), metadata (2)
-            # Metadata suele ser JSON o string, ajustar según tu esquema
-            import json
-            meta = json.loads(row[2]) if row[2] else {}
-            docs.append(Document(page_content=row[1], metadata=meta))
+        try:
+            cursor.execute(sql, embedding=embedding_array, k=k)
             
-        cursor.close()
-        return docs
+            docs = []
+            for row in cursor:
+                # row[0]=id, row[1]=text, row[2]=metadata
+                # Manejo seguro de metadata (puede ser None o string JSON)
+                meta_content = row[2]
+                if meta_content:
+                    if isinstance(meta_content, str):
+                        try:
+                            meta = json.loads(meta_content)
+                        except json.JSONDecodeError:
+                            meta = {"content": meta_content}
+                    elif isinstance(meta_content, dict):
+                        meta = meta_content
+                    else:
+                        meta = {}
+                else:
+                    meta = {}
+
+                docs.append(Document(page_content=row[1], metadata=meta))
+                
+            return docs
+        except Exception as e:
+            logger.error(f"Error en similarity_search: {e}")
+            raise e
+        finally:
+            cursor.close()
 
     @classmethod
     def from_texts(cls, *args, **kwargs):
