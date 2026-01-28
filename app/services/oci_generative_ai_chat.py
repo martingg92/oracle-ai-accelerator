@@ -3,9 +3,9 @@ import os
 #from langchain_community.chat_models import ChatOCIGenAI
 from langchain_oci import ChatOCIGenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.chains import create_history_aware_retriever, create_retrieval_chain
+#from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 
-from langchain.chains.combine_documents import create_stuff_documents_chain
+#from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import PromptTemplate
 from langchain_core.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -23,6 +23,50 @@ load_dotenv()
 # Initialize the service
 db_doc_service = database.DocService()
 db_agent_service = database.AgentService()
+
+# --- INICIO DE CORRECCIÓN MANUAL (Polyfills para LangChain OCI) ---
+from langchain_core.runnables import RunnablePassthrough, RunnableBranch
+from langchain_core.output_parsers import StrOutputParser
+
+def create_stuff_documents_chain(llm, prompt):
+    """Recreación manual de create_stuff_documents_chain"""
+    def format_docs(inputs):
+        # Une el contenido de los documentos encontrados
+        return "\n\n".join(doc.page_content for doc in inputs["context"])
+    
+    return (
+        RunnablePassthrough.assign(context=format_docs)
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+def create_history_aware_retriever(llm, retriever, prompt):
+    """Recreación manual de create_history_aware_retriever"""
+    # 1. Cadena para reformular la pregunta si hay historial
+    rephrase_chain = prompt | llm | StrOutputParser()
+    
+    # 2. Lógica: Si hay historial -> reformular y buscar. Si no -> buscar directo.
+    return RunnableBranch(
+        (
+            lambda x: len(x.get("chat_history", [])) > 0, 
+            rephrase_chain | retriever
+        ),
+        (
+            lambda x: True, # Caso por defecto (sin historial)
+            (lambda x: x["input"]) | retriever
+        )
+    )
+
+def create_retrieval_chain(retriever, combine_docs_chain):
+    """Recreación manual de create_retrieval_chain"""
+    return (
+        RunnablePassthrough.assign(
+            context=retriever
+        )
+        | combine_docs_chain
+    )
+# --- FIN DE CORRECCIÓN MANUAL ---
 
 class GenerativeAIService:
     """
