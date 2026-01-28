@@ -6,8 +6,37 @@ import streamlit as st
 from streamlit_float import *
 
 from annotated_text import annotated_text, annotation
-from langchain_community.chat_message_histories import StreamlitChatMessageHistory
+#from langchain_community.chat_message_histories import StreamlitChatMessageHistory
+# ============================================================
+# REEMPLAZO DE langchain_community.chat_message_histories
+# ============================================================
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 
+class StreamlitChatMessageHistory(BaseChatMessageHistory):
+    """Reemplazo local de langchain_community StreamlitChatMessageHistory"""
+    
+    def __init__(self, key: str = "chat_messages"):
+        self._key = key
+        if self._key not in st.session_state:
+            st.session_state[self._key] = []
+    
+    @property
+    def messages(self) -> List[BaseMessage]:
+        return st.session_state[self._key]
+    
+    def add_message(self, message: BaseMessage) -> None:
+        st.session_state[self._key].append(message)
+    
+    def add_user_message(self, message: str) -> None:
+        self.add_message(HumanMessage(content=message))
+    
+    def add_ai_message(self, message: str) -> None:
+        self.add_message(AIMessage(content=message))
+    
+    def clear(self) -> None:
+        st.session_state[self._key] = []
+        
 import components as component
 import services.database as database
 import services as service
