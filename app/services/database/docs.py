@@ -4,7 +4,6 @@ from services.database.connection import Connection
 #from langchain_community.embeddings.oci_generative_ai import OCIGenAIEmbeddings
 #from langchain_community.vectorstores import OracleVS
 from langchain_oci import OCIGenAIEmbeddings
-from langchain_oracledb.vectorstores import oraclevs
 from langchain_oracledb.vectorstores.oraclevs import OracleVS
 
 class DocService:
