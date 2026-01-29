@@ -44,9 +44,7 @@ class OracleVS(VectorStore):
         """Realiza búsqueda vectorial usando Oracle 23ai."""
         embedding = self.embedding_function.embed_query(query)
         
-        # --- CORRECCIÓN REALIZADA AQUÍ ---
-        # Antes decía 'vector', ahora usa 'embedding' que es el nombre real 
-        # confirmado en tu archivo j.TABLE_DOCS.sql
+        # SQL corregido (usa 'embedding')
         sql = f"""
             SELECT id, text, metadata 
             FROM {self.table_name}
@@ -54,7 +52,7 @@ class OracleVS(VectorStore):
             FETCH FIRST :k ROWS ONLY
         """
         
-        # Convertir embedding a array float (requerido por oracledb 2.0+)
+        # Convertir embedding a array float
         embedding_array = array.array("f", embedding)
 
         cursor = self.client.cursor()
@@ -63,23 +61,37 @@ class OracleVS(VectorStore):
             
             docs = []
             for row in cursor:
-                # row[0]=id, row[1]=text, row[2]=metadata
-                # Manejo seguro de metadata (puede ser None o string JSON)
-                meta_content = row[2]
-                if meta_content:
-                    if isinstance(meta_content, str):
-                        try:
-                            meta = json.loads(meta_content)
-                        except json.JSONDecodeError:
-                            meta = {"content": meta_content}
-                    elif isinstance(meta_content, dict):
-                        meta = meta_content
-                    else:
-                        meta = {}
+                # row[0]=id, row[1]=text (CLOB), row[2]=metadata (CLOB)
+                
+                # --- CORRECCIÓN CLOB TEXTO ---
+                text_obj = row[1]
+                if hasattr(text_obj, "read"): # Si es un LOB, leerlo
+                    page_content = text_obj.read()
                 else:
-                    meta = {}
+                    page_content = str(text_obj) if text_obj else ""
 
-                docs.append(Document(page_content=row[1], metadata=meta))
+                # --- CORRECCIÓN CLOB METADATA ---
+                meta_obj = row[2]
+                meta_str = ""
+                if hasattr(meta_obj, "read"): # Si es un LOB, leerlo
+                    meta_str = meta_obj.read()
+                else:
+                    meta_str = str(meta_obj) if meta_obj else ""
+
+                # Parsear JSON de metadata
+                meta = {}
+                if meta_str:
+                    try:
+                        # Intentamos parsear si parece un JSON
+                        if meta_str.strip().startswith("{"):
+                            meta = json.loads(meta_str)
+                        else:
+                            meta = {"content": meta_str}
+                    except json.JSONDecodeError:
+                        meta = {"content": meta_str}
+                
+                # Crear documento compatible con LangChain
+                docs.append(Document(page_content=page_content, metadata=meta))
                 
             return docs
         except Exception as e:
