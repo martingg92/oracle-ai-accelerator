@@ -30,7 +30,7 @@ from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, System
 from langchain_core.outputs import ChatResult, ChatGeneration
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, PromptTemplate
 from langchain_core.prompts.chat import SystemMessagePromptTemplate
-from langchain_core.runnables import RunnablePassthrough, RunnableBranch
+from langchain_core.runnables import RunnablePassthrough, RunnableBranch, RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.callbacks.manager import CallbackManagerForLLMRun
 from pydantic import Field
@@ -270,38 +270,89 @@ class ChatOCIGenAIDirect(BaseChatModel):
 # =============================================================================
 # POLYFILLS para LangChain (sin chains.combine_documents)
 # =============================================================================
+from langchain_core.runnables import RunnableLambda
+
 def create_stuff_documents_chain(llm, prompt):
-    """Recreación de create_stuff_documents_chain."""
+    """
+    Recreación de create_stuff_documents_chain.
+    Retorna el texto de respuesta del LLM.
+    """
     def format_docs(inputs):
-        return "\n\n".join(doc.page_content for doc in inputs.get("context", []))
+        docs = inputs.get("context", [])
+        if isinstance(docs, list) and len(docs) > 0:
+            return "\n\n".join(doc.page_content for doc in docs)
+        return ""
     
-    return (
-        RunnablePassthrough.assign(context=format_docs)
-        | prompt
-        | llm
-        | StrOutputParser()
-    )
+    def run_chain(inputs):
+        # Formatear documentos
+        formatted_context = format_docs(inputs)
+        
+        # Preparar inputs para el prompt
+        prompt_inputs = {**inputs, "context": formatted_context}
+        
+        # Ejecutar prompt -> llm
+        messages = prompt.invoke(prompt_inputs)
+        response = llm.invoke(messages)
+        
+        # Extraer texto
+        if hasattr(response, 'content'):
+            return response.content
+        return str(response)
+    
+    return RunnableLambda(run_chain)
 
 
 def create_history_aware_retriever(llm, retriever, prompt):
-    """Recreación de create_history_aware_retriever."""
-    rephrase_chain = prompt | llm | StrOutputParser()
+    """
+    Recreación de create_history_aware_retriever.
+    Si hay historial, reformula la pregunta antes de buscar.
+    """
+    def run_retriever(inputs):
+        chat_history = inputs.get("chat_history", inputs.get("history", []))
+        
+        if chat_history and len(chat_history) > 0:
+            # Reformular pregunta con contexto del historial
+            messages = prompt.invoke(inputs)
+            response = llm.invoke(messages)
+            
+            if hasattr(response, 'content'):
+                rephrased = response.content
+            else:
+                rephrased = str(response)
+            
+            # Buscar con pregunta reformulada
+            return retriever.invoke(rephrased)
+        else:
+            # Sin historial, buscar directamente
+            return retriever.invoke(inputs.get("input", ""))
     
-    return RunnableBranch(
-        (
-            lambda x: len(x.get("chat_history", [])) > 0, 
-            rephrase_chain | retriever
-        ),
-        (lambda x: x["input"]) | retriever
-    )
+    return RunnableLambda(run_retriever)
 
 
 def create_retrieval_chain(retriever, combine_docs_chain):
-    """Recreación de create_retrieval_chain."""
-    return (
-        RunnablePassthrough.assign(context=retriever)
-        | combine_docs_chain
-    )
+    """
+    Recreación de create_retrieval_chain.
+    Retorna dict con keys: input, context, answer
+    """
+    def run_chain(inputs):
+        # Obtener documentos
+        docs = retriever.invoke(inputs)
+        
+        # Preparar inputs con contexto
+        chain_inputs = {**inputs, "context": docs}
+        
+        # Ejecutar chain de documentos
+        answer = combine_docs_chain.invoke(chain_inputs)
+        
+        # Retornar en formato esperado
+        return {
+            "input": inputs.get("input", ""),
+            "context": docs,
+            "answer": answer,
+            "chat_history": inputs.get("chat_history", inputs.get("history", [])),
+        }
+    
+    return RunnableLambda(run_chain)
 
 
 # =============================================================================
