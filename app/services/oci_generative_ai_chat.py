@@ -410,7 +410,7 @@ class GenerativeAIService:
         context_retriever = vector_store.as_retriever(
             search_type="similarity",
             search_kwargs={
-                "k": 5,
+                "k": 7, #5
                 "filter": {"file_id": file_id}
             }
         )
