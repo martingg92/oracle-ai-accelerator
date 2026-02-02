@@ -69,7 +69,7 @@ class OracleVS(VectorStore):
         
         cursor = self.client.cursor()
         try:
-            cursor.execute(sql, **bind_vars)
+            cursor.execute(sql, bind_vars) #cursor.execute(sql, **bind_vars)
             docs = []
             for row in cursor:
                 text_obj = row[1]
