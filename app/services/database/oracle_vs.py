@@ -39,64 +39,50 @@ class OracleVS(VectorStore):
         return []
 
     def similarity_search(
-        self, query: str, k: int = 4, **kwargs: Any
+        self, query: str, k: int = 7, filter: dict = None, **kwargs: Any
     ) -> List[Document]:
-        """Realiza búsqueda vectorial usando Oracle 23ai."""
+        """Realiza búsqueda vectorial usando Oracle 23ai con filtro opcional."""
         embedding = self.embedding_function.embed_query(query)
         
-        # SQL corregido (usa 'embedding')
+        # Construir WHERE dinámico
+        where_clause = ""
+        bind_vars = {"embedding": array.array("f", embedding), "k": k}
+        
+        if filter and "file_id" in filter:
+            file_ids = filter["file_id"]
+            if isinstance(file_ids, list):
+                placeholders = ", ".join([f":fid{i}" for i in range(len(file_ids))])
+                where_clause = f"WHERE file_id IN ({placeholders})"
+                for i, fid in enumerate(file_ids):
+                    bind_vars[f"fid{i}"] = fid
+            else:
+                where_clause = "WHERE file_id = :file_id"
+                bind_vars["file_id"] = file_ids
+        
         sql = f"""
-            SELECT id, text, metadata 
+            SELECT id, text, metadata, file_id
             FROM {self.table_name}
+            {where_clause}
             ORDER BY VECTOR_DISTANCE(embedding, :embedding, {self.distance_strategy})
             FETCH FIRST :k ROWS ONLY
         """
         
-        # Convertir embedding a array float
-        embedding_array = array.array("f", embedding)
-
         cursor = self.client.cursor()
         try:
-            cursor.execute(sql, embedding=embedding_array, k=k)
-            
+            cursor.execute(sql, **bind_vars)
             docs = []
             for row in cursor:
-                # row[0]=id, row[1]=text (CLOB), row[2]=metadata (CLOB)
-                
-                # --- CORRECCIÓN CLOB TEXTO ---
                 text_obj = row[1]
-                if hasattr(text_obj, "read"): # Si es un LOB, leerlo
-                    page_content = text_obj.read()
-                else:
-                    page_content = str(text_obj) if text_obj else ""
-
-                # --- CORRECCIÓN CLOB METADATA ---
+                page_content = text_obj.read() if hasattr(text_obj, "read") else str(text_obj or "")
+                
                 meta_obj = row[2]
-                meta_str = ""
-                if hasattr(meta_obj, "read"): # Si es un LOB, leerlo
-                    meta_str = meta_obj.read()
-                else:
-                    meta_str = str(meta_obj) if meta_obj else ""
-
-                # Parsear JSON de metadata
-                meta = {}
-                if meta_str:
-                    try:
-                        # Intentamos parsear si parece un JSON
-                        if meta_str.strip().startswith("{"):
-                            meta = json.loads(meta_str)
-                        else:
-                            meta = {"content": meta_str}
-                    except json.JSONDecodeError:
-                        meta = {"content": meta_str}
+                meta_str = meta_obj.read() if hasattr(meta_obj, "read") else str(meta_obj or "")
                 
-                # Crear documento compatible con LangChain
+                meta = json.loads(meta_str) if meta_str.strip().startswith("{") else {"content": meta_str}
+                meta["file_id"] = row[3]  # Agregar file_id a metadata
+                
                 docs.append(Document(page_content=page_content, metadata=meta))
-                
             return docs
-        except Exception as e:
-            logger.error(f"Error en similarity_search: {e}")
-            raise e
         finally:
             cursor.close()
 
