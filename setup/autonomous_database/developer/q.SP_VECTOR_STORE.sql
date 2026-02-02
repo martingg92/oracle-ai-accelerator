@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE SP_VECTOR_STORE (
+ CREATE OR REPLACE PROCEDURE SP_VECTOR_STORE (
        p_file_id IN NUMBER
     ) AS
     BEGIN
@@ -14,7 +14,14 @@ CREATE OR REPLACE PROCEDURE SP_VECTOR_STORE (
         FROM VW_DOCS_FILES a
             CROSS JOIN dbms_vector_chain.utl_to_chunks(
                 a.TEXT,
-                json('{"by":"words","max":"200","overlap":"40","split":"recursively","language":"' || a.LANGUAGE || '","normalize":"all"}')
+                json('{
+                    "by"        : "characters",
+                    "max"       : "512",
+                    "overlap"   : "51",
+                    "split"     : "recursively",
+                    "language"  : "'|| a.LANGUAGE ||'",
+                    "normalize" : "all"
+                }')
             ) c
             CROSS JOIN JSON_TABLE(
                 c.column_value, '$[*]'
@@ -27,7 +34,12 @@ CREATE OR REPLACE PROCEDURE SP_VECTOR_STORE (
             ) ct
             CROSS JOIN dbms_vector_chain.utl_to_embeddings(
                 ct.chunk_data,
-                json('{"provider":"ocigenai","credential_name":"c_r_e_d_e_n_t_i_a_l__n_a_m_e","url":"e_m_b__m_o_d_e_l__u_r_l","model":"e_m_b__m_o_d_e_l__i_d"}')
+                json('{
+                    "provider"        : "ocigenai",
+                    "credential_name" : "c_r_e_d_e_n_t_i_a_l__n_a_m_e",
+                    "url"             : "e_m_b__m_o_d_e_l__u_r_l",
+                    "model"           : "e_m_b__m_o_d_e_l__i_d"
+                }')
             ) e
             CROSS JOIN JSON_TABLE(
                 e.column_value, '$[*]'
