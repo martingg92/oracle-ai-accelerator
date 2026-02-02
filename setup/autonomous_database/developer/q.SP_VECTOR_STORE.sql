@@ -14,7 +14,7 @@ CREATE OR REPLACE PROCEDURE SP_VECTOR_STORE (
         FROM VW_DOCS_FILES a
             CROSS JOIN dbms_vector_chain.utl_to_chunks(
                 a.TEXT,
-                json('{"by":"words","max":"200","overlap":"40","split":"recursively","language":"'|| a.LANGUAGE ||'","normalize":"all"}')
+                json('{"by":"words","max":"200","overlap":"40","split":"recursively","language":"' || a.LANGUAGE || '","normalize":"all"}')
             ) c
             CROSS JOIN JSON_TABLE(
                 c.column_value, '$[*]'
